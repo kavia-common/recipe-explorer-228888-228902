@@ -98,10 +98,20 @@ export default function FeedPage() {
 
   return (
     <section className="page">
-      <h1 className="page__title">Feed</h1>
-      <p className="page__description">
-        Search recipes and narrow results by cuisine, diet, and cook time.
-      </p>
+      <header className="page-hero" aria-label="Feed cover">
+        <img
+          className="page-hero__image"
+          src="/assets/cat.jpg"
+          alt="A cozy retro cover featuring a cat"
+        />
+        <div className="page-hero__overlay" aria-hidden="true" />
+        <div className="page-hero__content">
+          <h1 className="page__title">Feed</h1>
+          <p className="page__description">
+            Search recipes and narrow results by cuisine, diet, and cook time.
+          </p>
+        </div>
+      </header>
 
       <RecipeFilters
         query={query}
