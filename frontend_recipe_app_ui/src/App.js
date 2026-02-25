@@ -8,6 +8,7 @@ import FavoritesPage from "./pages/FavoritesPage";
 import FeedPage from "./pages/FeedPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import PlannerPage from "./pages/PlannerPage";
+import RecipeDetailPage from "./pages/RecipeDetailPage";
 
 // PUBLIC_INTERFACE
 function App() {
@@ -20,6 +21,8 @@ function App() {
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
           <Route path="/planner" element={<PlannerPage />} />
+
+          <Route path="/recipes/:recipeId" element={<RecipeDetailPage />} />
 
           {/* Convenience redirect for potential future legacy path */}
           <Route path="/feed" element={<Navigate to="/" replace />} />

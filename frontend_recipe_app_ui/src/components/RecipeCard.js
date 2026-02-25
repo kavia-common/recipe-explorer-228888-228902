@@ -1,4 +1,5 @@
 import React from "react";
+import { Link, useLocation } from "react-router-dom";
 
 /**
  * Small presentational card for a recipe.
@@ -8,9 +9,12 @@ import React from "react";
 // PUBLIC_INTERFACE
 export default function RecipeCard({ recipe, onSelect, actionSlot }) {
   /** Render a responsive recipe card (image, title, metadata). */
+  const location = useLocation();
   if (!recipe) return null;
 
   const handleSelect = (event) => {
+    // If a parent still passes onSelect (legacy), keep it working.
+    // Otherwise, allow normal <Link> navigation.
     if (!onSelect) return;
     event.preventDefault();
     onSelect(recipe);
@@ -18,9 +22,10 @@ export default function RecipeCard({ recipe, onSelect, actionSlot }) {
 
   return (
     <article className="recipe-card">
-      <a
+      <Link
         className="recipe-card__link"
-        href="#recipe"
+        to={`/recipes/${encodeURIComponent(recipe.id)}`}
+        state={{ from: location.pathname + location.search }}
         onClick={handleSelect}
         aria-label={`View recipe: ${recipe.title}`}
       >
@@ -56,7 +61,11 @@ export default function RecipeCard({ recipe, onSelect, actionSlot }) {
             </div>
             <div className="recipe-card__meta-item">
               <dt>Cook</dt>
-              <dd>{typeof recipe.cookTimeMinutes === "number" ? `${recipe.cookTimeMinutes} min` : "—"}</dd>
+              <dd>
+                {typeof recipe.cookTimeMinutes === "number"
+                  ? `${recipe.cookTimeMinutes} min`
+                  : "—"}
+              </dd>
             </div>
             <div className="recipe-card__meta-item">
               <dt>Diet</dt>
@@ -64,7 +73,7 @@ export default function RecipeCard({ recipe, onSelect, actionSlot }) {
             </div>
           </dl>
         </div>
-      </a>
+      </Link>
     </article>
   );
 }

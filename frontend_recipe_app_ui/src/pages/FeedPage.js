@@ -134,13 +134,7 @@ export default function FeedPage() {
           <div className="recipe-grid" role="list" aria-label="Recipe results">
             {recipes.map((recipe) => (
               <div key={recipe.id} role="listitem">
-                <RecipeCard
-                  recipe={recipe}
-                  onSelect={() => {
-                    // Step 04 scope: browse only. Detail route comes later.
-                    // Keep a no-op action for now.
-                  }}
-                />
+                <RecipeCard recipe={recipe} />
               </div>
             ))}
           </div>
