@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import RecipeCard from "../components/RecipeCard";
 import RecipeFilters from "../components/RecipeFilters";
+import useLocalStorage from "../hooks/useLocalStorage";
 import { recipesApi } from "../services/recipesApi";
 import { mockCuisines, mockDiets } from "../data/mockRecipes";
 
@@ -26,6 +27,34 @@ export default function FeedPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [recipes, setRecipes] = useState([]);
+
+  // Favorites are stored as a by-id map for quick lookup and easy persistence.
+  const [favoritesById, setFavoritesById] = useLocalStorage("recipeExplorer.favoritesById", {});
+
+  const toggleFavorite = (recipe) => {
+    if (!recipe?.id) return;
+
+    setFavoritesById((prev) => {
+      const safePrev = prev && typeof prev === "object" ? prev : {};
+      const next = { ...safePrev };
+
+      if (next[recipe.id]) {
+        delete next[recipe.id];
+      } else {
+        next[recipe.id] = {
+          id: recipe.id,
+          title: recipe.title,
+          description: recipe.description,
+          imageUrl: recipe.imageUrl,
+          cuisine: recipe.cuisine,
+          diet: recipe.diet,
+          cookTimeMinutes: recipe.cookTimeMinutes
+        };
+      }
+
+      return next;
+    });
+  };
 
   const params = useMemo(
     () => ({
@@ -134,7 +163,11 @@ export default function FeedPage() {
           <div className="recipe-grid" role="list" aria-label="Recipe results">
             {recipes.map((recipe) => (
               <div key={recipe.id} role="listitem">
-                <RecipeCard recipe={recipe} />
+                <RecipeCard
+                  recipe={recipe}
+                  isFavorite={Boolean(favoritesById?.[recipe.id])}
+                  onToggleFavorite={toggleFavorite}
+                />
               </div>
             ))}
           </div>

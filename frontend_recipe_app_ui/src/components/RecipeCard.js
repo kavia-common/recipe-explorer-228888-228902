@@ -7,7 +7,13 @@ import { Link, useLocation } from "react-router-dom";
  * - Supports keyboard focus via the link
  */
 // PUBLIC_INTERFACE
-export default function RecipeCard({ recipe, onSelect, actionSlot }) {
+export default function RecipeCard({
+  recipe,
+  onSelect,
+  actionSlot,
+  isFavorite = false,
+  onToggleFavorite
+}) {
   /** Render a responsive recipe card (image, title, metadata). */
   const location = useLocation();
   if (!recipe) return null;
@@ -19,6 +25,8 @@ export default function RecipeCard({ recipe, onSelect, actionSlot }) {
     event.preventDefault();
     onSelect(recipe);
   };
+
+  const canToggleFavorite = typeof onToggleFavorite === "function";
 
   return (
     <article className="recipe-card">
@@ -45,9 +53,25 @@ export default function RecipeCard({ recipe, onSelect, actionSlot }) {
         <div className="recipe-card__body">
           <div className="recipe-card__header">
             <h3 className="recipe-card__title">{recipe.title}</h3>
-            {actionSlot ? (
+
+            {actionSlot || canToggleFavorite ? (
               <div className="recipe-card__action" aria-label="Card actions">
                 {actionSlot}
+                {canToggleFavorite ? (
+                  <button
+                    type="button"
+                    className="btn btn--ghost"
+                    aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                    onClick={(e) => {
+                      // Prevent the underlying Link navigation.
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onToggleFavorite(recipe);
+                    }}
+                  >
+                    {isFavorite ? "★ Saved" : "☆ Save"}
+                  </button>
+                ) : null}
               </div>
             ) : null}
           </div>

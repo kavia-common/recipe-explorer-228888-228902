@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
+import useLocalStorage from "../hooks/useLocalStorage";
 import { recipesApi } from "../services/recipesApi";
 
 function formatMinutes(value) {
@@ -40,6 +41,37 @@ export default function RecipeDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [recipe, setRecipe] = useState(null);
+
+  // Favorites are stored as an object map keyed by recipe.id for O(1) checks.
+  const [favoritesById, setFavoritesById] = useLocalStorage("recipeExplorer.favoritesById", {});
+
+  const isFavorite = Boolean(recipe?.id && favoritesById?.[recipe.id]);
+
+  const toggleFavorite = (recipeToToggle) => {
+    if (!recipeToToggle?.id) return;
+
+    setFavoritesById((prev) => {
+      const safePrev = prev && typeof prev === "object" ? prev : {};
+      const next = { ...safePrev };
+
+      if (next[recipeToToggle.id]) {
+        delete next[recipeToToggle.id];
+      } else {
+        // Store a compact snapshot so FavoritesPage can render without refetching.
+        next[recipeToToggle.id] = {
+          id: recipeToToggle.id,
+          title: recipeToToggle.title,
+          description: recipeToToggle.description,
+          imageUrl: recipeToToggle.imageUrl,
+          cuisine: recipeToToggle.cuisine,
+          diet: recipeToToggle.diet,
+          cookTimeMinutes: recipeToToggle.cookTimeMinutes
+        };
+      }
+
+      return next;
+    });
+  };
 
   // Preserve the originating page (Feed, Categories, etc.) when navigating via Link state.
   const backLink = useMemo(() => {
@@ -138,6 +170,15 @@ export default function RecipeDetailPage() {
         <Link className="btn btn--ghost" to={backLink} aria-label="Go back">
           ← Back
         </Link>
+
+        <button
+          type="button"
+          className="btn btn--ghost"
+          aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+          onClick={() => toggleFavorite(recipe)}
+        >
+          {isFavorite ? "★ Saved" : "☆ Save"}
+        </button>
       </div>
 
       <header className="detail-header">
